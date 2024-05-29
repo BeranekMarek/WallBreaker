@@ -66,6 +66,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pbPlatno);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "WallBreaker";

@@ -28,11 +28,21 @@ namespace Wall_Breaker
             InitializeComponent();
         }
 
+        // Cihly
+        clsCihla[] mobjCihly;
+        const int mintPocetCihel = 40;
+        const int mintPrvniCihlyX = 10, mintPrvniCihlyY = 10, mintPrvniCihlyMezera = 5;
+        const int mintSirkaCihly = 50, mintVyskaCihly = 20;
+
+
+
         //----------------------------------------------------------------------------
         // nahrani formu do pameti
         //----------------------------------------------------------------------------
         private void Form1_Load(object sender, EventArgs e)
         {
+            int lintCihlaX, lintCihlaY;
+
             // vytvoreni grafiky z pisctureboxu
             mobjPlatnoForm = pbPlatno.CreateGraphics();
 
@@ -41,10 +51,34 @@ namespace Wall_Breaker
             mobjPlatnoBackround = Graphics.FromImage(mobjMyBitmap);
 
             // vytvorit kulicku
-            mobjKulicka = new clsKulicka(50, 50, 2, 10);
+            mobjKulicka = new clsKulicka(50, 150, 2, 10, mobjPlatnoBackround);
+            mobjKulicka.StetecKulicky = Brushes.Red;
+
+            // Vytvoření cihel
+            mobjCihly = new clsCihla[mintPocetCihel]; // Vytvoření pole (array)
+
+            // Vytvoření jednotlivých cihel
+            lintCihlaX = mintPrvniCihlyX;
+            lintCihlaY = mintPrvniCihlyY;
+
+            for (int i = 0; i < mintPocetCihel; i++)
+            {
+                // Vytvoření cihly
+                mobjCihly[i] = new clsCihla(lintCihlaX, lintCihlaY, mintSirkaCihly, mintVyskaCihly, mobjPlatnoBackround);
+
+                // Posun po ose X
+                lintCihlaX = lintCihlaX + mintSirkaCihly + mintPrvniCihlyMezera;
+
+                // Test na další řadu
+                if ((lintCihlaX + mintSirkaCihly + mintPrvniCihlyMezera) > pbPlatno.Width)
+                {
+                    lintCihlaX = mintPrvniCihlyX;
+                    lintCihlaY = lintCihlaY + mintVyskaCihly + mintPrvniCihlyMezera;
+                }
+            }
 
             // nastaveni timeru prekresleni
-            tmrRedraw.Interval = 10;
+            tmrRedraw.Interval = 5;
             tmrRedraw.Enabled = true;
         }
 
@@ -60,6 +94,24 @@ namespace Wall_Breaker
             // nakresli kolecko
             mobjKulicka.VykresliSe();
 
+            // Vykreslit cihly
+            for (int i = 0; i < mintPocetCihel; i++)
+            {
+                //test kolize s kulickou
+                if (true==TestKolizeCihlaKulicka(mobjKulicka.rectObrys, mobjCihly[i].rectObrys))
+                {
+                    // cihla neni videt
+                    mobjCihly[i].blVisible = false;
+
+                    // zmena pohybu kulicky
+                    mobjKulicka.ZmenPohybY();
+                
+                }
+
+                //vykresleni cihly
+                mobjCihly[i].Vykreslit();
+            }
+
             // posun kulicky
             mobjKulicka.PosunSe();
             
@@ -67,5 +119,28 @@ namespace Wall_Breaker
             mobjPlatnoForm.DrawImage(mobjMyBitmap, 0, 0);
 
         }
+
+        //----------------------------------------------------------------------------
+        // test kolize cihly a kulicky
+        //----------------------------------------------------------------------------
+        private bool TestKolizeCihlaKulicka(Rectangle objRectKulicka, Rectangle objRectCihla)
+        {
+            Rectangle lobjPrekryv;
+            lobjPrekryv = Rectangle.Intersect(objRectKulicka, objRectCihla);
+
+
+            // test zda existuje prekryty obdelnik
+            if (lobjPrekryv.Width == 0 && lobjPrekryv.Height == 0) 
+                return false;
+            
+            // objekty se prekryvaji
+            return true;
+        }
+        
+        // poznamky po hodine
+        // na pboxu je treba zachytit keydown atd
+        // :(
+
+
     }
 }
