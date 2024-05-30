@@ -22,6 +22,9 @@ namespace Wall_Breaker
         //kulicka
         clsKulicka mobjKulicka;
 
+        //vozicek
+        clsVozicek mobjVozicek;
+
         // random button
         public Form1()
         {
@@ -56,6 +59,9 @@ namespace Wall_Breaker
 
             // Vytvoření cihel
             mobjCihly = new clsCihla[mintPocetCihel]; // Vytvoření pole (array)
+
+            // Vytvoření vozicku
+            mobjVozicek = new clsVozicek(100, 150, 200, 100);
 
             // Vytvoření jednotlivých cihel
             lintCihlaX = mintPrvniCihlyX;
