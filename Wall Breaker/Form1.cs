@@ -12,24 +12,18 @@ namespace Wall_Breaker
 {
     public partial class Form1 : Form
     {
-        // bitmapa do ktere kreslim
+        // bitmapa do které kreslím
         Bitmap mobjMyBitmap;
         Graphics mobjPlatnoBackround;
 
-        // grafika na okne z pictureboxu
+        // grafika na okně z pictureboxu
         Graphics mobjPlatnoForm;
 
-        //kulicka
+        // kulička
         clsKulicka mobjKulicka;
 
-        //vozicek
+        // vozíček
         clsVozicek mobjVozicek;
-
-        // random button
-        public Form1()
-        {
-            InitializeComponent();
-        }
 
         // Cihly
         clsCihla[] mobjCihly;
@@ -37,45 +31,50 @@ namespace Wall_Breaker
         const int mintPrvniCihlyX = 10, mintPrvniCihlyY = 10, mintPrvniCihlyMezera = 5;
         const int mintSirkaCihly = 50, mintVyskaCihly = 20;
 
-
+        public Form1()
+        {
+            InitializeComponent();
+            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
+            this.KeyPreview = true; // Přidáno pro zachytávání kláves ve formuláři
+        }
 
         //----------------------------------------------------------------------------
-        // nahrani formu do pameti
+        // nahrání formu do paměti
         //----------------------------------------------------------------------------
         private void Form1_Load(object sender, EventArgs e)
         {
             int lintCihlaX, lintCihlaY;
 
-            // vytvoreni grafiky z pisctureboxu
+            // vytvoření grafiky z pictureboxu
             mobjPlatnoForm = pbPlatno.CreateGraphics();
 
-            // vytvorenji bitmapy
-            mobjMyBitmap = new Bitmap(pbPlatno.Width,pbPlatno.Height);
+            // vytvoření bitmapy
+            mobjMyBitmap = new Bitmap(pbPlatno.Width, pbPlatno.Height);
             mobjPlatnoBackround = Graphics.FromImage(mobjMyBitmap);
 
-            // vytvorit kulicku
+            // vytvoření kuličky
             mobjKulicka = new clsKulicka(50, 150, 2, 10, mobjPlatnoBackround);
             mobjKulicka.StetecKulicky = Brushes.Red;
 
-            // Vytvoření cihel
+            // vytvoření cihel
             mobjCihly = new clsCihla[mintPocetCihel]; // Vytvoření pole (array)
 
-            // Vytvoření vozicku
-            mobjVozicek = new clsVozicek(100, 150, 200, 100);
+            // vytvoření vozíčku
+            mobjVozicek = new clsVozicek(100, pbPlatno.Height - 30, 100, 20, mobjPlatnoBackround); // Upravte souřadnice a rozměry vozíčku podle potřeby
 
-            // Vytvoření jednotlivých cihel
+            // vytvoření jednotlivých cihel
             lintCihlaX = mintPrvniCihlyX;
             lintCihlaY = mintPrvniCihlyY;
 
             for (int i = 0; i < mintPocetCihel; i++)
             {
-                // Vytvoření cihly
+                // vytvoření cihly
                 mobjCihly[i] = new clsCihla(lintCihlaX, lintCihlaY, mintSirkaCihly, mintVyskaCihly, mobjPlatnoBackround);
 
-                // Posun po ose X
+                // posun po ose X
                 lintCihlaX = lintCihlaX + mintSirkaCihly + mintPrvniCihlyMezera;
 
-                // Test na další řadu
+                // test na další řadu
                 if ((lintCihlaX + mintSirkaCihly + mintPrvniCihlyMezera) > pbPlatno.Width)
                 {
                     lintCihlaX = mintPrvniCihlyX;
@@ -83,70 +82,112 @@ namespace Wall_Breaker
                 }
             }
 
-            // nastaveni timeru prekresleni
+            // nastavení timeru překreslení
             tmrRedraw.Interval = 5;
             tmrRedraw.Enabled = true;
         }
 
-
         //----------------------------------------------------------------------------
-        // prekresleni obrazu
+        // překreslení obrazu
         //----------------------------------------------------------------------------
         private void tmrRedraw_Tick(object sender, EventArgs e)
         {
-            //vymazat platno - pohyb
+            // vymazat plátno - pohyb
             mobjPlatnoBackround.Clear(Color.White);
 
-            // nakresli kolecko
+            // nakreslit kuličku
             mobjKulicka.VykresliSe();
 
-            // Vykreslit cihly
-            for (int i = 0; i < mintPocetCihel; i++)
+                // vykreslit cihly
+                for (int i = 0; i < mintPocetCihel; i++)
             {
-                //test kolize s kulickou
-                if (true==TestKolizeCihlaKulicka(mobjKulicka.rectObrys, mobjCihly[i].rectObrys))
+                // test kolize s kuličkou
+                if (true == TestKolizeCihlaKulicka(mobjKulicka.rectObrys, mobjCihly[i].rectObrys))
                 {
-                    // cihla neni videt
+                    // cihla není vidět
                     mobjCihly[i].blVisible = false;
 
-                    // zmena pohybu kulicky
+                    // změna pohybu kuličky
                     mobjKulicka.ZmenPohybY();
-                
                 }
 
-                //vykresleni cihly
+                // vykreslení cihly
                 mobjCihly[i].Vykreslit();
             }
 
-            // posun kulicky
-            mobjKulicka.PosunSe();
-            
-            // vykesleni na pbPlatno
-            mobjPlatnoForm.DrawImage(mobjMyBitmap, 0, 0);
+            // test kolize vozíčku s kuličkou
+            if (TestKolizeVozicekKulicka(mobjKulicka.rectObrys, new Rectangle(mobjVozicek.X, mobjVozicek.Y, mobjVozicek.Sirka, mobjVozicek.Vyska)))
+            {
+                mobjKulicka.ZmenPohybY();
+            }
 
+            // vykreslit vozíček
+            mobjVozicek.Zobraz();
+
+            // posun kuličky
+            mobjKulicka.PosunSe();
+
+            // vykreslení na pbPlatno
+            mobjPlatnoForm.DrawImage(mobjMyBitmap, 0, 0);
         }
 
         //----------------------------------------------------------------------------
-        // test kolize cihly a kulicky
+        // test kolize cihly a kuličky
         //----------------------------------------------------------------------------
         private bool TestKolizeCihlaKulicka(Rectangle objRectKulicka, Rectangle objRectCihla)
         {
             Rectangle lobjPrekryv;
             lobjPrekryv = Rectangle.Intersect(objRectKulicka, objRectCihla);
 
-
-            // test zda existuje prekryty obdelnik
-            if (lobjPrekryv.Width == 0 && lobjPrekryv.Height == 0) 
+            // test zda existuje překrytý obdélník
+            if (lobjPrekryv.Width == 0 && lobjPrekryv.Height == 0)
                 return false;
-            
-            // objekty se prekryvaji
+
+            // objekty se překrývají
             return true;
         }
-        
-        // poznamky po hodine
-        // na pboxu je treba zachytit keydown atd
-        // :(
 
+        //----------------------------------------------------------------------------
+        // test kolize vozíčku a kuličky
+        //----------------------------------------------------------------------------
+        private bool TestKolizeVozicekKulicka(Rectangle objRectKulicka, Rectangle objRectVozicek)
+        {
+            Rectangle lobjPrekryv;
+            lobjPrekryv = Rectangle.Intersect(objRectKulicka, objRectVozicek);
 
+            // test zda existuje překrytý obdélník
+            if (lobjPrekryv.Width == 0 && lobjPrekryv.Height == 0)
+                return false;
+
+            // objekty se překrývají
+            return true;
+        }
+
+        //----------------------------------------------------------------------------
+        // zpracování událostí kláves
+        //----------------------------------------------------------------------------
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            const int krok = 5; // krok pohybu vozíčku
+
+            if (e.KeyCode == Keys.Left)
+            {
+                if (mobjVozicek.X - krok >= 0)
+                {
+                    mobjVozicek.X -= krok;
+                    tmrRedraw_Tick(sender, e); // Překreslit form
+                }
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                if (mobjVozicek.X + mobjVozicek.Sirka + krok <= pbPlatno.Width)
+                {
+                    mobjVozicek.X += krok;
+                    tmrRedraw_Tick(sender, e); // Překreslit form
+                }
+            }
+        }
     }
+
+
 }
