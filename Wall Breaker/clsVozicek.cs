@@ -93,7 +93,7 @@ namespace Wall_Breaker
         // ovladani plosiny
         public void PosunRight()
         {
-            if (mintVozicekX < 0)
+            if (mintVozicekPosun < 0)
             {
                 mintVozicekPosun = mintVozicekPosun * (-1);
             }
