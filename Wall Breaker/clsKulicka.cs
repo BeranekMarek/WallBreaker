@@ -19,6 +19,8 @@ namespace Wall_Breaker
         int mintKulickaPolomer = 10;
         Brush mobjBrush;
 
+        public bool mbjGameOver = false;
+
         public clsKulicka(int intKulickaX, int intKulickaY,
             int intKulickaPosun, int intKulickaPolomer,
             Graphics objPlatno)
@@ -112,6 +114,8 @@ namespace Wall_Breaker
                 mintKulickaPosunX = mintKulickaPosunX * (-1);
             }
 
+            if (mintKulickaY > mobjPlatno.VisibleClipBounds.Height - mintKulickaPolomer)
+                mbjGameOver = true;
         }
 
 

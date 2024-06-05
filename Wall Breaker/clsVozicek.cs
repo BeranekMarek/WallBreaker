@@ -12,6 +12,9 @@ namespace Wall_Breaker
         // Plátno
         Graphics mobjPlatno;
 
+        // integery pro pouziti venku
+        public int pintVozicekX, pintVozicekY, pintVozicekSirka;
+
         // Souřadnice vozíčku
         int mintVozicekX, mintVozicekY;
         int mintVozicekSirka, mintVozicekVyska;
@@ -20,24 +23,36 @@ namespace Wall_Breaker
         // Je vozíček vidět?
         bool mblIsVisible;
 
+        // posun plosiny
+        int mintVozicekPosun;
+
         //-----------------------------------------
         // Konstruktor
         //-----------------------------------------
-        public clsVozicek(int intVozicekX, int intVozicekY, int intVozicekSirka, int intVozicekVyska, Graphics objPlatno)
+        public clsVozicek(int intVozicekX, int intVozicekY, int intVozicekSirka, int intVozicekVyska, int intVozicekPosun, Graphics objPlatno)
         {
-            mintVozicekX = intVozicekX;
-            mintVozicekY = intVozicekY;
-            mintVozicekSirka = intVozicekSirka;
+            pintVozicekX = mintVozicekX = intVozicekX;
+            pintVozicekY = mintVozicekY = intVozicekY;
+            pintVozicekSirka = mintVozicekSirka = intVozicekSirka;
             mintVozicekVyska = intVozicekVyska;
-            mobjBrush = Brushes.Black;
-            mblIsVisible = true;
+            mintVozicekPosun = intVozicekPosun;
             mobjPlatno = objPlatno;
+            mobjBrush = new SolidBrush(Color.Black);
+
+            mblIsVisible = true;
+        }
+
+        // posune souradnice plosiny
+        public void PosunVozicek()
+        {
+            mintVozicekX = mintVozicekX + mintVozicekPosun;
+            pintVozicekX = mintVozicekX;
         }
 
         //-----------------------------------------
         // Metoda pro zobrazení vozíčku
         //-----------------------------------------
-        public void Zobraz()
+        public void VykresliSe()
         {
             if (mblIsVisible)
             {
@@ -45,13 +60,8 @@ namespace Wall_Breaker
             }
         }
 
-        //-----------------------------------------
-        // Metoda pro nastavení viditelnosti
-        //-----------------------------------------
-        public void NastavViditelnost(bool viditelnost)
-        {
-            mblIsVisible = viditelnost;
-        }
+
+        
 
         //-----------------------------------------
         // Vlastnosti pro přístup k souřadnicím a rozměrům vozíčku
@@ -78,6 +88,22 @@ namespace Wall_Breaker
         {
             get { return mintVozicekVyska; }
             set { mintVozicekVyska = value; }
+        }
+
+        // ovladani plosiny
+        public void PosunRight()
+        {
+            if (mintVozicekX < 0)
+            {
+                mintVozicekPosun = mintVozicekPosun * (-1);
+            }
+        }
+        public void PosunLeft()
+        {
+            if (mintVozicekPosun > 0)
+            {
+                mintVozicekPosun = mintVozicekPosun * (-1);
+            }
         }
     }
 }

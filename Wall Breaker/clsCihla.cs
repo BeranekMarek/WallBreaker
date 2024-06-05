@@ -17,6 +17,8 @@ namespace Wall_Breaker
         int mintCihlaSirka, mintCihlaVyska;
         Brush mobjBrush;
 
+        public bool mbjGameWin;
+
         // Je cihla vidět?
         bool mblIsVisible;
 
@@ -31,6 +33,7 @@ namespace Wall_Breaker
             mintCihlaVyska = intCihlaVyska;
             mobjBrush = Brushes.Black;
             mblIsVisible = true;
+            mbjGameWin = false;
 
             mobjPlatno = objPlatno;
         }
@@ -92,5 +95,7 @@ namespace Wall_Breaker
 
             mobjPlatno.FillRectangle(mobjBrush, mintCihlaX, mintCihlaY, mintCihlaSirka, mintCihlaVyska);
         }
+
+   
     }
 }

@@ -25,6 +25,9 @@ namespace Wall_Breaker
         // vozíček
         clsVozicek mobjVozicek;
 
+        // mackam klavesnici
+        public bool mbjOvladam;
+
         // Cihly
         clsCihla[] mobjCihly;
         const int mintPocetCihel = 40;
@@ -34,8 +37,6 @@ namespace Wall_Breaker
         public Form1()
         {
             InitializeComponent();
-            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
-            this.KeyPreview = true; // Přidáno pro zachytávání kláves ve formuláři
         }
 
         //----------------------------------------------------------------------------
@@ -59,8 +60,8 @@ namespace Wall_Breaker
             // vytvoření cihel
             mobjCihly = new clsCihla[mintPocetCihel]; // Vytvoření pole (array)
 
-            // vytvoření vozíčku
-            mobjVozicek = new clsVozicek(100, pbPlatno.Height - 30, 100, 20, mobjPlatnoBackround); // Upravte souřadnice a rozměry vozíčku podle potřeby
+            // vytvoreni vozicku
+            mobjVozicek = new clsVozicek((int)(mobjPlatnoForm.VisibleClipBounds.Width / 2), 400, 100, 10, 3, mobjPlatnoBackround);
 
             // vytvoření jednotlivých cihel
             lintCihlaX = mintPrvniCihlyX;
@@ -95,6 +96,9 @@ namespace Wall_Breaker
             // vymazat plátno - pohyb
             mobjPlatnoBackround.Clear(Color.White);
 
+            // vykreslit vozíček
+            mobjVozicek.VykresliSe();
+
             // nakreslit kuličku
             mobjKulicka.VykresliSe();
 
@@ -121,14 +125,75 @@ namespace Wall_Breaker
                 mobjKulicka.ZmenPohybY();
             }
 
-            // vykreslit vozíček
-            mobjVozicek.Zobraz();
+            // nakresli vozicek
+            mobjVozicek.VykresliSe();
+            if (mbjOvladam == true)
+            {
+                mobjVozicek.PosunVozicek();
+            }
+
+
 
             // posun kuličky
             mobjKulicka.PosunSe();
 
             // vykreslení na pbPlatno
             mobjPlatnoForm.DrawImage(mobjMyBitmap, 0, 0);
+
+            // konec hry
+            if (mobjKulicka.mbjGameOver == true)
+            {
+                tmrRedraw.Enabled = false;
+                GameOver();
+            }
+
+        }
+        private void Form1_KeyDown(object sender, KeyEventArgs Klavesa)
+        {
+            try
+            {
+                switch (Klavesa.KeyCode)
+                {
+                    case Keys.Left:
+                        mobjVozicek.PosunLeft();
+
+                        // zastavuje plosiny proti vyjeti doleva
+                        if (mobjVozicek.pintVozicekX < 0)
+                        {
+                            mbjOvladam = false;
+                        }
+                        else
+                        {
+                            mbjOvladam = true;
+                        }
+                        break;
+                    case Keys.Right:
+                        mobjVozicek.PosunRight();
+
+                        // zastavuje plosiny proti vyjeti doprava
+                        if (mobjVozicek.pintVozicekX + mobjVozicek.pintVozicekSirka > mobjPlatnoForm.VisibleClipBounds.Width)
+                        {
+                            mbjOvladam = false;
+                        }
+                        else
+                        {
+                            mbjOvladam = true;
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                mbjOvladam = false;
+            }
+
+
+        }
+
+        // zrusi pohyb
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            mbjOvladam = false;
         }
 
         //----------------------------------------------------------------------------
@@ -163,31 +228,27 @@ namespace Wall_Breaker
             return true;
         }
 
-        //----------------------------------------------------------------------------
-        // zpracování událostí kláves
-        //----------------------------------------------------------------------------
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            const int krok = 5; // krok pohybu vozíčku
+        
 
-            if (e.KeyCode == Keys.Left)
+        // popup okynko s prohrou
+        public void GameOver()
+        {
+            DialogResult Restartovat = MessageBox.Show("LOOOOL GAME OVER!", "LMAO", MessageBoxButtons.YesNo);
+            switch (Restartovat)
             {
-                if (mobjVozicek.X - krok >= 0)
-                {
-                    mobjVozicek.X -= krok;
-                    tmrRedraw_Tick(sender, e); // Překreslit form
-                }
-            }
-            else if (e.KeyCode == Keys.Right)
-            {
-                if (mobjVozicek.X + mobjVozicek.Sirka + krok <= pbPlatno.Width)
-                {
-                    mobjVozicek.X += krok;
-                    tmrRedraw_Tick(sender, e); // Překreslit form
-                }
+                case DialogResult.Yes:
+                    Application.Restart();
+                    break;
+                case DialogResult.No:
+                    this.Close();
+                    break;
             }
         }
-    }
 
+
+
+
+
+    }
 
 }
