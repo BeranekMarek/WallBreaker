@@ -196,6 +196,8 @@ namespace Wall_Breaker
             mbjOvladam = false;
         }
 
+
+
         //----------------------------------------------------------------------------
         // test kolize cihly a kuličky
         //----------------------------------------------------------------------------
@@ -230,10 +232,10 @@ namespace Wall_Breaker
 
         
 
-        // popup okynko s prohrou
+        // okynko s prohrou
         public void GameOver()
         {
-            DialogResult Restartovat = MessageBox.Show("LOOOOL GAME OVER!", "LMAO", MessageBoxButtons.YesNo);
+            DialogResult Restartovat = MessageBox.Show("CHCES HRAT ZNOVA?", "LMAO", MessageBoxButtons.YesNo);
             switch (Restartovat)
             {
                 case DialogResult.Yes:
